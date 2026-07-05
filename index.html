@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Galería Premium</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .slider-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slider-wrapper {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      will-change: transform;
+    }
+
+    .slide {
+      min-width: 100%;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-color: #000;
+    }
+
+    /* Puntos guía inferiores muy sutiles */
+    .indicators {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .dot.active {
+      background: rgba(255, 255, 255, 0.95);
+      transform: scale(1.2);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slider-container">
+    <div id="sliderWrapper" class="slider-wrapper"></div>
+    <div id="indicators" class="indicators"></div>
+  </div>
+
+  <script>
+    // CONFIGURACIÓN: Escribe aquí exactamente los nombres de tus fotos organizadas
+    const images = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', '7.jpg', '8.jpg', '9.jpg', '10.jpg', '11.jpg', '12.jpg', '13.jpg', '14.jpg', '15.jpg', '16.jpg', '17.jpg', '18.jpg', '19.jpg']; 
+
+    let currentIndex = 0;
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const minSwipeDistance = 40;
+
+    const wrapper = document.getElementById('sliderWrapper');
+    const indicatorsContainer = document.getElementById('indicators');
+
+    // Generar la estructura de forma ultra rápida
+    images.forEach((img, index) => {
+      const slide = document.createElement('div');
+      slide.className = 'slide';
+      slide.style.backgroundImage = `url('${img}')`;
+      wrapper.appendChild(slide);
+
+      const dot = document.createElement('div');
+      dot.className = `dot ${index === 0 ? 'active' : ''}`;
+      indicatorsContainer.appendChild(dot);
+    });
+
+    // Inicializar gestos táctiles
+    const container = document.querySelector('.slider-container');
+    container.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    container.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      evaluateSwipe();
+    }, { passive: true });
+
+    function evaluateSwipe() {
+      const difference = touchStartX - touchEndX;
+      if (Math.abs(difference) > minSwipeDistance) {
+        if (difference > 0 && currentIndex < images.length - 1) {
+          currentIndex++;
+        } else if (difference < 0 && currentIndex > 0) {
+          currentIndex--;
+        }
+        updateSliderPosition();
+      }
+    }
+
+    function updateSliderPosition() {
+      wrapper.style.transform = `translateX(-${currentIndex * 100}%)`;
+      const dots = document.querySelectorAll('.dot');
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
+      });
+    }
+  </script>
+</body>
+</html>
